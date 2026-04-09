@@ -140,7 +140,7 @@ function createEventAndSendEmail(eventData) {
   ]);
 
 // 2. メール送信処理（★固定アドレスへ送信するように変更）
-  const targetEmail = 'kitayama@enaworks.net'; 
+  const targetEmail = 'neropi-2022@yahoo.co.jp'; 
 
   const subject = `【新着イベント】${eventData.title}`;
   const body = `サークルの新しいイベントが投稿されました！
@@ -197,20 +197,6 @@ function updateEvent(rowNumber, updatedData) {
     ]);
   }
   
-  // 4. 固定アドレス(kitayama@enaworks.net)へ通知
-  const subject = `【内容更新】${updatedData.title}`;
-  const body = `イベント内容が更新されました。
-
-【更新内容】: ${changes.join(', ')}
-
-【最新のタイトル】: ${updatedData.title}
-【日付】: ${updatedData.date}
-【場所】: ${updatedData.location}
-
-※詳細はサイトまたはスプレッドシートをご確認ください。`;
-
-  MailApp.sendEmail('kitayama@enaworks.net', subject, body);
-
   return true;
 }
 
@@ -238,8 +224,5 @@ function deleteEvent(rowNumber) {
   // 3. スプレッドシートから行を削除
   eventSheet.deleteRow(rowNumber);
   
-  // 4. 固定アドレス(kitayama@enaworks.net)へ通知
-  MailApp.sendEmail('kitayama@enaworks.net', `【削除通知】${oldTitle}`, `イベント「${oldTitle}」が削除されました。`);
-
   return true;
 }
