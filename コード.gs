@@ -140,7 +140,7 @@ function createEventAndSendEmail(eventData) {
   ]);
 
 // 2. メール送信処理（★固定アドレスへ送信するように変更）
-  const targetEmail = 'neropi-2022@yahoo.co.jp'; 
+  const targetEmail = 'kitayama@enaworks.net'; 
 
   const subject = `【新着イベント】${eventData.title}`;
   const body = `サークルの新しいイベントが投稿されました！
@@ -163,21 +163,83 @@ ${eventData.description}
 }
 
 
-// ▼▼▼ Code.gs の末尾に追加 ▼▼▼
-
 function updateEvent(rowNumber, updatedData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName('イベント一覧');
+  const eventSheet = ss.getSheetByName('イベント一覧');
+  const historySheet = ss.getSheetByName('変更履歴');
   
-  // 指定された行の A列(1)からD列(4)までを新しいデータで上書きする
-  // 順序: [日付, タイトル, 場所, 詳細]
-  const range = sheet.getRange(rowNumber, 1, 1, 4);
-  range.setValues([[
+  // 1. 変更前のデータを取得（履歴用）
+  const oldData = eventSheet.getRange(rowNumber, 1, 1, 4).getValues()[0];
+  const oldTitle = oldData[1];
+  
+  // 変更箇所の特定
+  let changes = [];
+  if (oldData[0] != updatedData.date) changes.push(`日付: ${updatedData.date}`);
+  if (oldData[1] != updatedData.title) changes.push(`タイトル: ${updatedData.title}`);
+  if (oldData[2] != updatedData.location) changes.push(`場所: ${updatedData.location}`);
+  if (oldData[3] != updatedData.description) changes.push("詳細を変更");
+
+  // 2. イベント一覧シートを更新
+  eventSheet.getRange(rowNumber, 1, 1, 4).setValues([[
     updatedData.date,
     updatedData.title,
     updatedData.location,
     updatedData.description
   ]]);
   
+  // 3. 変更履歴シートに記録を追加
+  if (changes.length > 0) {
+    historySheet.appendRow([
+      new Date(),       // 更新日時
+      rowNumber,        // 行番号
+      oldTitle,         // イベント名（変更前）
+      changes.join(', ') // 変更した項目
+    ]);
+  }
+  
+  // 4. 固定アドレス(kitayama@enaworks.net)へ通知
+  const subject = `【内容更新】${updatedData.title}`;
+  const body = `イベント内容が更新されました。
+
+【更新内容】: ${changes.join(', ')}
+
+【最新のタイトル】: ${updatedData.title}
+【日付】: ${updatedData.date}
+【場所】: ${updatedData.location}
+
+※詳細はサイトまたはスプレッドシートをご確認ください。`;
+
+  MailApp.sendEmail('kitayama@enaworks.net', subject, body);
+
+  return true;
+}
+
+
+// ▼▼▼ Code.gs の末尾に追加 ▼▼▼
+
+function deleteEvent(rowNumber) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const eventSheet = ss.getSheetByName('イベント一覧');
+  const historySheet = ss.getSheetByName('変更履歴');
+  
+  // 1. 削除前のタイトルを取得（履歴と通知用）
+  const oldTitle = eventSheet.getRange(rowNumber, 2).getValue();
+  
+  // 2. 変更履歴に記録
+  if (historySheet) {
+    historySheet.appendRow([
+      new Date(),
+      rowNumber,
+      oldTitle,
+      "イベントを削除しました"
+    ]);
+  }
+  
+  // 3. スプレッドシートから行を削除
+  eventSheet.deleteRow(rowNumber);
+  
+  // 4. 固定アドレス(kitayama@enaworks.net)へ通知
+  MailApp.sendEmail('kitayama@enaworks.net', `【削除通知】${oldTitle}`, `イベント「${oldTitle}」が削除されました。`);
+
   return true;
 }
