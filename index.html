@@ -4,17 +4,12 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>サークルイベントポータル</title>
+    <title>サークルイベント一覧</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       .card { transition: transform 0.1s; }
       .card:active { transform: scale(0.98); }
-      .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;  
-        overflow: hidden;
-      }
+      .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
   </head>
   <body class="bg-gray-100 min-h-screen">
@@ -25,65 +20,43 @@
 
     <div class="p-4 sticky top-[60px] bg-gray-100 z-10 border-b border-gray-200">
       <div class="relative max-w-md mx-auto">
-        <input type="text" id="search-input" oninput="handleSearch()" placeholder="イベント名、場所、日付で検索..." 
+        <input type="text" id="search-input" oninput="handleSearch()" placeholder="イベントを検索..." 
           class="w-full p-3 pl-10 rounded-full border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm">
         <span class="absolute left-3 top-3 text-gray-400">🔍</span>
       </div>
     </div>
 
-    <main id="app" class="p-4 max-w-md mx-auto pb-24">
+    <main id="app" class="p-4 max-w-md mx-auto pb-20">
       <div id="loading" class="text-center py-20 hidden">
         <div class="inline-block animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-        <p class="mt-2 text-gray-500 text-xs">通信中...</p>
       </div>
-
       <div id="event-list" class="space-y-4"></div>
-
       <div id="pagination" class="hidden justify-center items-center space-x-4 mt-8 mb-4">
-        <button id="prev-btn" onclick="changePage(-1)" class="px-4 py-2 bg-white text-gray-700 border rounded shadow disabled:opacity-30 text-sm font-bold">前へ</button>
+        <button id="prev-btn" onclick="changePage(-1)" class="px-4 py-2 bg-white border rounded shadow disabled:opacity-30 text-sm font-bold">前へ</button>
         <span id="page-info" class="text-sm font-bold text-gray-600">1 / 1</span>
-        <button id="next-btn" onclick="changePage(1)" class="px-4 py-2 bg-white text-gray-700 border rounded shadow disabled:opacity-30 text-sm font-bold">次へ</button>
+        <button id="next-btn" onclick="changePage(1)" class="px-4 py-2 bg-white border rounded shadow disabled:opacity-30 text-sm font-bold">次へ</button>
       </div>
     </main>
 
-    <button onclick="openCreateModal()" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-blue-700 transition-colors z-30">
-      ＋
-    </button>
+    <button onclick="openCreateModal()" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:bg-blue-700 z-30">＋</button>
 
     <div id="event-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto p-5">
         <div class="flex justify-between items-center mb-4 border-b pb-2">
-          <h2 id="modal-title" class="text-xl font-bold text-gray-800">新規イベント</h2>
-          <button id="delete-btn" onclick="handleDelete()" class="hidden text-red-500 text-sm font-bold border border-red-200 px-2 py-1 rounded hover:bg-red-50">削除</button>
+          <h2 id="modal-title" class="text-xl font-bold text-gray-800">イベント</h2>
+          <button id="delete-btn" onclick="handleDelete()" class="hidden text-red-500 text-sm font-bold border border-red-200 px-2 py-1 rounded">削除</button>
         </div>
-        
         <input type="hidden" id="edit-row-number">
         <div class="space-y-3">
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">日付 *</label>
-            <input type="date" id="input-date" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">イベント名 *</label>
-            <input type="text" id="input-title" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">場所</label>
-            <input type="text" id="input-location" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">投稿者名 *</label>
-            <input type="text" id="input-author" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-1">詳細</label>
-            <textarea id="input-desc" rows="10" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="内容を入力..."></textarea>
-          </div>
+          <div><label class="block text-sm font-bold text-gray-700">日付 *</label><input type="date" id="input-date" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"></div>
+          <div><label class="block text-sm font-bold text-gray-700">イベント名 *</label><input type="text" id="input-title" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"></div>
+          <div><label class="block text-sm font-bold text-gray-700">場所</label><input type="text" id="input-location" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"></div>
+          <div id="author-field"><label class="block text-sm font-bold text-gray-700">投稿者 *</label><input type="text" id="input-author" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"></div>
+          <div><label class="block text-sm font-bold text-gray-700">詳細</label><textarea id="input-desc" rows="10" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"></textarea></div>
         </div>
-
-        <div class="flex justify-end space-x-3 mt-6 pb-2">
-          <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded">キャンセル</button>
-          <button id="submit-btn" onclick="handleFormSubmit()" class="px-4 py-2 bg-blue-600 text-white font-bold rounded shadow">保存して送信</button>
+        <div class="flex justify-end space-x-3 mt-6">
+          <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded">キャンセル</button>
+          <button id="submit-btn" onclick="handleFormSubmit()" class="px-4 py-2 bg-blue-600 text-white rounded shadow">保存して送信</button>
         </div>
       </div>
     </div>
@@ -114,24 +87,18 @@
       function loadData() {
         document.getElementById('loading').classList.remove('hidden');
         document.getElementById('event-list').innerHTML = '';
-        google.script.run
-          .withSuccessHandler(renderEvents)
-          .withFailureHandler(handleError)
-          .getEvents(currentSearch, currentPage);
+        google.script.run.withSuccessHandler(renderEvents).withFailureHandler(handleError).getEvents(currentSearch, currentPage);
       }
 
       function renderEvents(data) {
         const list = document.getElementById('event-list');
-        const loading = document.getElementById('loading');
-        const pagination = document.getElementById('pagination');
-        
-        loading.classList.add('hidden');
-        list.innerHTML = ''; 
+        document.getElementById('loading').classList.add('hidden');
+        list.innerHTML = '';
         cachedEvents = data.events;
 
-        if (!data || !data.events || data.events.length === 0) {
+        if (!data.events || data.events.length === 0) {
           list.innerHTML = '<div class="bg-white rounded-lg shadow p-8 text-center text-gray-500 font-bold">該当するイベントが見つかりませんでした</div>';
-          pagination.classList.add('hidden');
+          document.getElementById('pagination').classList.add('hidden');
           return;
         }
 
@@ -139,7 +106,6 @@
           const isCompleted = (event.status === '完了');
           const card = document.createElement('div');
           card.className = `card bg-white rounded-lg shadow p-4 border-l-4 ${isCompleted ? 'border-green-500' : 'border-blue-500'}`;
-          
           card.innerHTML = `
             <div class="flex justify-between items-start mb-1">
               <span class="text-sm font-bold text-gray-600">${event.date}</span>
@@ -152,9 +118,9 @@
               <h2 class="text-lg font-bold text-gray-800 leading-tight">${event.title}</h2>
               <span class="shrink-0 text-xs font-bold px-2 py-1 rounded border ${isCompleted ? 'bg-green-100 text-green-700 border-green-200' : 'bg-blue-100 text-blue-700 border-blue-200'}">${isCompleted ? '✅ 完了' : '🗓 予定'}</span>
             </div>
-            <p class="text-sm text-gray-600 mb-2 font-medium">📍 ${event.location}</p>
+            <p class="text-sm text-gray-600 mb-2">📍 ${event.location}</p>
             <div id="desc-${index}" class="text-sm text-gray-700 whitespace-pre-wrap line-clamp-3">${event.description}</div>
-            <button id="btn-${index}" onclick="toggleText(${index})" class="mt-2 text-blue-600 text-sm font-bold">続きを読む</button>
+            <button id="btn-${index}" onclick="toggleText(${index})" class="mt-2 text-blue-600 text-sm font-bold flex items-center">続きを読む</button>
             <hr class="my-3 border-gray-100">
             ${isCompleted ? `
               <div class="bg-gray-50 p-3 rounded text-sm text-gray-700 border border-gray-200">
@@ -163,13 +129,13 @@
               </div>
             ` : `
               <div id="report-area-${index}" class="hidden mt-3">
-                <textarea id="report-text-${index}" class="w-full border rounded p-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" rows="3" placeholder="完了コメントを入力..."></textarea>
+                <textarea id="report-text-${index}" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" rows="3" placeholder="コメントを入力..."></textarea>
                 <div class="flex justify-end mt-2 space-x-2">
                   <button onclick="hideReportForm(${index})" class="px-3 py-1 text-sm text-gray-600 border rounded bg-white">キャンセル</button>
-                  <button onclick="submitReport(${index}, ${event.rowNumber})" class="px-3 py-1 text-sm bg-green-500 text-white font-bold rounded">送信</button>
+                  <button onclick="submitReport(${index}, ${event.rowNumber})" class="px-3 py-1 text-sm bg-green-500 text-white font-bold rounded shadow">報告を送信</button>
                 </div>
               </div>
-              <button id="show-report-btn-${index}" onclick="showReportForm(${index})" class="w-full py-2 bg-gray-50 border rounded text-sm font-bold text-gray-700">📝 イベント完了を報告する</button>
+              <button id="show-report-btn-${index}" onclick="showReportForm(${index})" class="w-full py-2 bg-gray-50 border rounded text-sm font-bold text-gray-700 transition-colors">📝 イベント完了を報告する</button>
             `}
           `;
           list.appendChild(card);
@@ -180,103 +146,130 @@
           }, 50);
         });
 
-        pagination.classList.remove('hidden');
-        pagination.classList.add('flex');
+        document.getElementById('pagination').classList.remove('hidden');
+        document.getElementById('pagination').classList.add('flex');
         document.getElementById('page-info').innerText = `${data.currentPage} / ${data.totalPages}`;
         document.getElementById('prev-btn').disabled = (data.currentPage <= 1);
         document.getElementById('next-btn').disabled = (data.currentPage >= data.totalPages);
       }
 
-      // モーダル操作
-      function openCreateModal() {
-        document.getElementById('modal-title').innerText = "新規イベントを投稿";
-        const delBtn = document.getElementById('delete-btn');
-        delBtn.classList.add('hidden');
-        delBtn.disabled = false;
-        delBtn.innerText = "削除";
-        document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-btn').innerText = "保存して送信";
-        document.getElementById('edit-row-number').value = "";
-        document.getElementById('input-date').value = new Date().toISOString().split('T')[0];
-        document.getElementById('event-modal').classList.remove('hidden');
-      }
-
+      // --- 修正箇所：編集モーダルを開く処理 ---
       function openEditModal(index) {
         const event = cachedEvents[index];
         document.getElementById('modal-title').innerText = "イベントを編集";
+        
         const delBtn = document.getElementById('delete-btn');
         delBtn.classList.remove('hidden');
         delBtn.disabled = false;
         delBtn.innerText = "削除";
-        document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-btn').innerText = "保存して送信";
+
+        const subBtn = document.getElementById('submit-btn');
+        subBtn.disabled = false;
+        subBtn.innerText = "保存して送信";
+
         document.getElementById('edit-row-number').value = event.rowNumber;
         
+        // 日付のセット (yyyy/MM/dd -> yyyy-MM-dd)
         const d = new Date(event.date);
-        document.getElementById('input-date').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        document.getElementById('input-date').value = `${yyyy}-${mm}-${dd}`;
+        
         document.getElementById('input-title').value = event.title;
         document.getElementById('input-location').value = event.location;
-        document.getElementById('input-author').value = event.author;
+        document.getElementById('input-author').value = event.author; // ★追加：投稿者をセット
         document.getElementById('input-desc').value = event.description;
+        
         document.getElementById('event-modal').classList.remove('hidden');
+        document.getElementById('author-field').classList.remove('hidden'); // ★追加：投稿者欄を表示
       }
 
-      function closeModal() {
-        document.getElementById('event-modal').classList.add('hidden');
-        document.getElementById('input-title').value = '';
-        document.getElementById('input-location').value = '';
-        document.getElementById('input-author').value = '';
-        document.getElementById('input-desc').value = '';
-      }
+// 新規投稿モーダルを開く処理（クリア処理を追加）
+function openCreateModal() {
+  // 1. 各入力フィールドを空にリセット
+  document.getElementById('input-title').value = "";
+  document.getElementById('input-location').value = "";
+  document.getElementById('input-author').value = ""; 
+  document.getElementById('input-desc').value = "";
+  document.getElementById('edit-row-number').value = ""; // これが重要！編集モードを解除します
+
+  // 2. モーダルのタイトルを「新規イベント」に変更
+  document.getElementById('modal-title').innerText = "新規イベントを投稿";
+  
+  // 3. 削除ボタンを隠す（新規投稿時は不要）
+  const delBtn = document.getElementById('delete-btn');
+  delBtn.classList.add('hidden');
+  delBtn.disabled = false;
+  delBtn.innerText = "削除";
+
+  // 4. 保存ボタンの状態をリセット
+  const subBtn = document.getElementById('submit-btn');
+  subBtn.disabled = false;
+  subBtn.innerText = "保存して送信";
+
+  // 5. 日付だけは「今日」をデフォルトでセット
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  document.getElementById('input-date').value = `${yyyy}-${mm}-${dd}`;
+  
+  // 6. モーダルを表示
+  document.getElementById('event-modal').classList.remove('hidden');
+}
+      function closeModal() { document.getElementById('event-modal').classList.add('hidden'); }
 
       function handleFormSubmit() {
-        const row = document.getElementById('edit-row-number').value;
-        const eventData = {
-          date: document.getElementById('input-date').value.replace(/-/g, '/'),
-          title: document.getElementById('input-title').value,
-          location: document.getElementById('input-location').value,
-          author: document.getElementById('input-author').value,
-          description: document.getElementById('input-desc').value
-        };
-        if (!eventData.date || !eventData.title || !eventData.author) { alert('必須項目を埋めてください'); return; }
+        const rowNumber = document.getElementById('edit-row-number').value;
+        const date = document.getElementById('input-date').value.replace(/-/g, '/');
+        const title = document.getElementById('input-title').value;
+        const location = document.getElementById('input-location').value;
+        const author = document.getElementById('input-author').value;
+        const description = document.getElementById('input-desc').value;
+
+        if (!date || !title || !author) { alert('必須項目を入力してください'); return; }
 
         const btn = document.getElementById('submit-btn');
-        btn.disabled = true; btn.innerText = '送信中...';
+        btn.disabled = true;
+        btn.innerText = '送信中...';
 
-        if (row) {
-          google.script.run.withSuccessHandler(() => { alert('更新完了！'); loadData(); closeModal(); }).updateEvent(row, eventData);
+        if (rowNumber) {
+          google.script.run.withSuccessHandler(() => { alert('更新しました！'); loadData(); closeModal(); }).updateEvent(rowNumber, { date, title, location, description });
         } else {
-          google.script.run.withSuccessHandler(() => { alert('投稿完了！'); loadData(); closeModal(); }).createEventAndSendEmail(eventData);
+          google.script.run.withSuccessHandler(() => { alert('投稿しました！'); loadData(); closeModal(); }).createEventAndSendEmail({ date, title, location, author, description });
         }
       }
 
       function handleDelete() {
-        const row = document.getElementById('edit-row-number').value;
-        if (confirm("本当に削除しますか？")) {
+        const rowNumber = document.getElementById('edit-row-number').value;
+        if (confirm(`このイベントを削除しますか？`)) {
           const btn = document.getElementById('delete-btn');
-          btn.disabled = true; btn.innerText = "削除中...";
-          google.script.run.withSuccessHandler(() => { alert('削除しました'); loadData(); closeModal(); }).deleteEvent(row);
+          btn.disabled = true;
+          btn.innerText = "削除中...";
+          google.script.run.withSuccessHandler(() => { alert('削除しました'); loadData(); closeModal(); }).deleteEvent(rowNumber);
         }
       }
 
-      // その他UI
       function toggleAuthor(index) {
         const el = document.getElementById(`author-${index}`);
         if (el.classList.contains('truncate')) { el.classList.remove('truncate', 'max-w-[120px]'); el.classList.add('break-all'); }
         else { el.classList.add('truncate', 'max-w-[120px]'); el.classList.remove('break-all'); }
       }
+
       function toggleText(index) {
         const desc = document.getElementById(`desc-${index}`);
         const btn = document.getElementById(`btn-${index}`);
         if (desc.classList.contains('line-clamp-3')) { desc.classList.remove('line-clamp-3'); btn.innerText = '閉じる'; }
         else { desc.classList.add('line-clamp-3'); btn.innerText = '続きを読む'; }
       }
+
       function showReportForm(index) { document.getElementById(`report-area-${index}`).classList.remove('hidden'); }
       function hideReportForm(index) { document.getElementById(`report-area-${index}`).classList.add('hidden'); }
-      function submitReport(index, row) {
+      function submitReport(index, rowNumber) {
         const comment = document.getElementById(`report-text-${index}`).value;
         if(!comment.trim()) return;
-        google.script.run.withSuccessHandler(() => { alert('報告しました！'); loadData(); }).submitCompletion(row, comment);
+        google.script.run.withSuccessHandler(() => { alert('報告しました！'); loadData(); }).submitCompletion(rowNumber, comment);
       }
       function handleError(e) { alert("エラー: " + e.message); document.getElementById('loading').classList.add('hidden'); }
     </script>
